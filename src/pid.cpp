@@ -43,8 +43,6 @@ void pid_init() {
   myPID.SetMode(AUTOMATIC);
   myPID.SetSampleTime(SAMPLE_PERIOD); 
   myPID.SetOutputLimits(OUTPUT_MIN, OUTPUT_MAX);
-
-
 }
 
 //void pid_control_loop(union sigval)
