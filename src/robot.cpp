@@ -15,7 +15,7 @@
 #include "debug.h"
 #include "beagleIO.h"
 #include "commandlineparsing.h"
-//#include "sonar.h"
+#include "remote.h"
 
 using namespace std;
 
@@ -27,9 +27,6 @@ ProgramVariables	prgm_vars;
 
 // PID Loop timer ID
 timer_t pid_loop_id;
-
-//SonarSystem *sonar;
-//SonarSystem::SonarSensor *sensors;
 
 // Main function
 int main(int argc, char *argv[]) {
@@ -51,7 +48,7 @@ int main(int argc, char *argv[]) {
 		background();
 	}
 
-	// Uninitialize system
+	// Uninitialized system
 	uninit_sys();
 }
 
@@ -59,6 +56,7 @@ void init_vars() {
 	// Set robot initial state
 	current_state.speed_command = 0.0;
 	current_state.direction_command = 0.0;
+	current_state.remote_enabled = false;
 	current_state.state = RBS_WAIT_FOR_START_CMD;
 
 	// Init program variables
@@ -73,6 +71,7 @@ void init_vars() {
 	prgm_vars.startDelayPeriod.tv_nsec = DEFAULT_START_DELAY_NSEC;
 	prgm_vars.startPosistion.location = {0.0, 0.0};
 	prgm_vars.startPosistion.heading = 0.0;
+	prgm_vars.remotePort = 1988;
 }
 
 // Program Setup Function
@@ -83,16 +82,13 @@ void init_sys() {
 	encoders_init();	// Init wheel encoders
 	debug_init();		// Init debug features
 	timer_init();		// Init robot loop timer
-	//sonar_init();
-
-	//sensors = new SonarSystem::SonarSensor[1];
-
-	//sensors->fileDesc = 0;
+	remote_init();		// Init remote control
 }
 
 void uninit_sys() {
 	timer_uninit();		// Uninit PID control loop
 	encoders_uninit();	// Uninit wheel encoders
+	remote_uninit();	// Uninit remote server
 
 	// Turn off LEDs
 	LED1_PIN.writePin(true);
@@ -157,6 +153,9 @@ void background() {
 	// Get the current time
 	clock_gettime(CLOCK_BOOTTIME, &current_time);
 
+	// Process data from remote
+	process_remote();
+
 	// Print the current location
 	if (current_time > prev_time) {
 		switch (current_state.state) {
@@ -173,6 +172,10 @@ void background() {
 			LED2_PIN.writePin(true);
 
 			break;
+//		case RBS_REMOTE:
+
+
+//			break;
 		case RBS_START_DELAY:
 		case RBS_PAUSED:
 			// Update time to new value
@@ -247,6 +250,31 @@ void robot_run(union sigval arg) {
 
 			// Set robot to delay mode
 			current_state.state = RBS_START_DELAY;
+		} else if (current_state.remote_enabled == true) {
+			// Print the starting waypoint
+			printf("==Remote Enabled==\n");
+
+			current_state.state = RBS_REMOTE;
+		}
+
+		break;
+	case RBS_REMOTE:
+		if (current_state.remote_enabled == true) {
+			// Set current speed and direction
+			current_state.speed_command = remote_speed_command;
+			current_state.direction_command = remote_direction_command;
+
+			 // Update the current location
+			update_location(&current_state.posistion);
+		} else {
+			// Stop Movement
+			current_state.speed_command = 0.0;
+
+			// Print the starting waypoint
+			printf("==Remote Disabled==\n");
+
+			// Go to finished state
+			current_state.state = RBS_FINISHED;
 		}
 
 		break;

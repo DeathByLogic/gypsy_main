@@ -52,10 +52,22 @@ typedef struct {
 	Posistion				startPosistion;				// The starting position of the robot
 	PIDParam				PIDValues;					// The Kp, Ki and Kd values
 	timespec				PIDLoopPeriod;				// The PID loop period
+	short					remotePort;					// Port for the remote
 } ProgramVariables;
+
+typedef struct {
+	int						leftTickCount;
+	int						rightTickCount;
+	float					leftTickPeriod;
+	float					rightTickPeriod;
+	float					frontSonarDistance;
+	float					leftSonarDistance;
+	float					rightSonarDistance;
+} SensorData;
 
 typedef enum {
 	RBS_WAIT_FOR_START_CMD,
+	RBS_REMOTE,
 	RBS_START_DELAY,
 	RBS_RUNNING,
 	RBS_PAUSED,
@@ -67,6 +79,7 @@ typedef struct {
 	Posistion				posistion;
 	double					speed_command;
 	double					direction_command;
+	bool					remote_enabled;
 	RobotStates				state;
 } RobotVariables;
 
