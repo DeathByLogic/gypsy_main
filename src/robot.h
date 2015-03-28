@@ -54,6 +54,16 @@ typedef struct {
 	timespec				PIDLoopPeriod;				// The PID loop period
 } ProgramVariables;
 
+typedef struct {
+	int						leftTickCount;
+	int						rightTickCount;
+	float					leftTickPeriod;
+	float					rightTickPeriod;
+	float					frontSonarDistance;
+	float					leftSonarDistance;
+	float					rightSonarDistance;
+} SensorData;
+
 typedef enum {
 	RBS_WAIT_FOR_START_CMD,
 	RBS_START_DELAY,
@@ -64,10 +74,30 @@ typedef enum {
 } RobotStates;
 
 typedef struct {
+	long					leftTick;
+	long					rightTick;
+	unsigned long			leftPeriod;
+	unsigned long			rightPeriod;
+} WheelEncoders;
+
+typedef struct {
+	float					front;
+	float					left;
+	float					right;
+} DistanceSensors;
+
+typedef struct {
+	WheelEncoders			encoders;
+	DistanceSensors			distance;
+} RobotSensors;
+
+typedef struct {
 	Posistion				posistion;
-	double					speed_command;
-	double					direction_command;
+	float					speed;
+	double					speedCommand;
+	double					directionCommand;
 	RobotStates				state;
+	RobotSensors			sensors;
 } RobotVariables;
 
 // External variables

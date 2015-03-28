@@ -15,9 +15,7 @@
 #include "debug.h"
 #include "beagleIO.h"
 #include "commandlineparsing.h"
-//#include "sonar.h"
-
-using namespace std;
+#include "sensors.h"
 
 // Current Robot State
 RobotVariables		current_state;
@@ -27,9 +25,6 @@ ProgramVariables	prgm_vars;
 
 // PID Loop timer ID
 timer_t pid_loop_id;
-
-//SonarSystem *sonar;
-//SonarSystem::SonarSensor *sensors;
 
 // Main function
 int main(int argc, char *argv[]) {
@@ -51,14 +46,14 @@ int main(int argc, char *argv[]) {
 		background();
 	}
 
-	// Uninitialize system
+	// Uninitialized system
 	uninit_sys();
 }
 
 void init_vars() {
 	// Set robot initial state
-	current_state.speed_command = 0.0;
-	current_state.direction_command = 0.0;
+	current_state.speedCommand = 0.0;
+	current_state.directionCommand = 0.0;
 	current_state.state = RBS_WAIT_FOR_START_CMD;
 
 	// Init program variables
@@ -80,19 +75,14 @@ void init_sys() {
 	robot_init();		// Init robot pins and setting
 	pid_init();			// Init PID control loop
 	motor_init();		// Init motor control
-	encoders_init();	// Init wheel encoders
+//	encoders_init();	// Init wheel encoders
 	debug_init();		// Init debug features
 	timer_init();		// Init robot loop timer
-	//sonar_init();
-
-	//sensors = new SonarSystem::SonarSensor[1];
-
-	//sensors->fileDesc = 0;
 }
 
 void uninit_sys() {
 	timer_uninit();		// Uninit PID control loop
-	encoders_uninit();	// Uninit wheel encoders
+//	encoders_uninit();	// Uninit wheel encoders
 
 	// Turn off LEDs
 	LED1_PIN.writePin(true);
@@ -263,7 +253,7 @@ void robot_run(union sigval arg) {
 	case RBS_RUNNING:
 		if (current_waypoint == route.last()) {
 			// If at last waypoint stop
-			current_state.speed_command = 0.0;
+			current_state.speedCommand = 0.0;
 
 			printf("== Stopping Movement ==\n");
 
@@ -271,10 +261,16 @@ void robot_run(union sigval arg) {
 			current_state.state = RBS_FINISHED;
 		} else {
 			// Maintain current speed
-			current_state.speed_command = prgm_vars.defaultSpeed;
+			current_state.speedCommand = prgm_vars.defaultSpeed;
+
+			// Read Sensors
+			update_sensor_values();
 
 			 // Update the current location
-			update_location(&current_state.posistion);
+			update_location(&current_state.posistion, current_state.sensors.encoders.leftTick, current_state.sensors.encoders.rightTick);
+
+			// Update the current speed
+			update_speed(&current_state.speed, current_state.sensors.encoders.leftPeriod, current_state.sensors.encoders.rightPeriod);
 
 			// Calculate the error value
 			ct_error = calculate_cte(current_waypoint, current_state.posistion.location);
@@ -288,7 +284,7 @@ void robot_run(union sigval arg) {
 				current_state.state = RBS_PAUSED;
 
 				// Stop the robot
-				current_state.speed_command = 0.0;
+				current_state.speedCommand = 0.0;
 
 				printf("== Pausing Movement ==\n");
 			}
@@ -297,10 +293,10 @@ void robot_run(union sigval arg) {
 		break;
 	case RBS_PAUSED:
 		// Stop the robot
-		current_state.speed_command = 0.0;
+		current_state.speedCommand = 0.0;
 
 		// Update the current location
-		update_location(&current_state.posistion);
+		update_location(&current_state.posistion, current_state.sensors.encoders.leftTick, current_state.sensors.encoders.rightTick);
 
 		// If Emergency button is released, resume
 		if (PAUSE_BUTTON_PIN.readPin() == true) {
@@ -314,7 +310,7 @@ void robot_run(union sigval arg) {
 		break;
 	case RBS_FINISHED:
 		// Stop the robot
-		current_state.speed_command = 0.0;
+		current_state.speedCommand = 0.0;
 
 		if (START_BUTTON_PIN.readPin() == false) {
 			// Update start delay time to new value
@@ -337,7 +333,7 @@ void robot_run(union sigval arg) {
 	}
 
 	// Update h-bridge output
-	motor_update(current_state.speed_command, current_state.direction_command);
+	motor_update(current_state.speedCommand, current_state.directionCommand);
 }
 
 // Load a path into the route
