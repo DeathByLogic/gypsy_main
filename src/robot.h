@@ -76,11 +76,31 @@ typedef enum {
 } RobotStates;
 
 typedef struct {
+	long					leftTick;
+	long					rightTick;
+	unsigned long			leftPeriod;
+	unsigned long			rightPeriod;
+} WheelEncoders;
+
+typedef struct {
+	float					front;
+	float					left;
+	float					right;
+} DistanceSensors;
+
+typedef struct {
+	WheelEncoders			encoders;
+	DistanceSensors			distance;
+} RobotSensors;
+
+typedef struct {
 	Posistion				posistion;
-	double					speed_command;
-	double					direction_command;
+	float					speed;
+	double					speedCommand;
+	double					directionCommand;
 	bool					remote_enabled;
 	RobotStates				state;
+	RobotSensors			sensors;
 } RobotVariables;
 
 // External variables

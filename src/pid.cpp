@@ -34,7 +34,7 @@ double ct_target = 0.0;
 double ct_error = 0.0;
 
 //Specify the links and initial tuning parameters
-PID myPID(&ct_error, &current_state.direction_command, &ct_target, tuned_50s.Kp, tuned_50s.Ki, tuned_50s.Kd, DIRECT);
+PID myPID(&ct_error, &current_state.directionCommand, &ct_target, tuned_50s.Kp, tuned_50s.Ki, tuned_50s.Kd, DIRECT);
 //PID myPID(&ct_error, &robot_dir, &ct_target, tuned_50s.Kp, tuned_50s.Ki, tuned_50s.Kd, DIRECT);
 //PID_ATune aTune(&ct_error, &robot_dir);
 
@@ -43,8 +43,6 @@ void pid_init() {
   myPID.SetMode(AUTOMATIC);
   myPID.SetSampleTime(SAMPLE_PERIOD); 
   myPID.SetOutputLimits(OUTPUT_MIN, OUTPUT_MAX);
-
-
 }
 
 //void pid_control_loop(union sigval)
