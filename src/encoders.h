@@ -6,7 +6,7 @@
 #define WHEEL_DIM			4.875		// Diameter of wheels
 #define ENC_COUNT			100			// Number of encoder counts per revolution
 
-#define PERIOD_DIVIDER		1000000		// Microseconds per second
+#define PERIOD_DIVIDER		1E6			// Microseconds per second
 
 //Function Prototypes
 void encoders_init();

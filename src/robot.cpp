@@ -56,7 +56,7 @@ void init_vars() {
 	current_state.directionCommand = 0.0;
 	current_state.state = RBS_WAIT_FOR_START_CMD;
 
-	// Init program variables
+	// Initialize program variables
 	prgm_vars.PIDLoopPeriod.tv_sec = DEFAULT_PID_PERIOD_SEC;
 	prgm_vars.PIDLoopPeriod.tv_nsec = DEFAULT_PID_PERIOD_NSEC;
 	prgm_vars.PIDValues = {1.45, 0.11, 4.59};
