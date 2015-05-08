@@ -7,12 +7,13 @@
 
 #define HBRIDGE_MIN_VOLTAGE 	34  // Cutoff voltage of roughly 10V
 #define HBRIDGE_DEADBAND    	3   // Deadband cutoff of 3 counts
+#define HBRIDGE_TIMEOUT			200 // Serial timeout of 200ms
 
 #define HBRIDGE_CMD_MIN    	   -127
 #define HBRIDGE_CMD_MAX     	127
 
 #define HBRIDGE_SERIAL_TX_PIN	P8_37
-#define HBRIDGE_SERIAL_TX_DUMMY	P8_43
+#define HBRIDGE_SHUTDOWN		P8_41
 
 // Motion Constants
 #define SPEED_MIN          	   -100
