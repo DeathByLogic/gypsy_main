@@ -16,6 +16,12 @@
 #define LED1_PIN					P8_39
 #define LED2_PIN					P8_45
 
+#define LED_SLOW_PULSE_SEC			0
+#define LED_SLOW_PULSE_NSEC			500E6
+
+#define LED_FAST_PULSE_SEC			0
+#define LED_FAST_PULSE_NSEC			100E6
+
 #define DEFAULT_ROBOT_SPEED			25
 
 #define DEFAULT_START_DELAY_SEC		1

@@ -80,8 +80,9 @@ void init_sys() {
 	motor_init();		// Init motor control
 //	encoders_init();	// Init wheel encoders
 	debug_init();		// Init debug features
-	timer_init();		// Init robot loop timer
 	remote_init();		// Init remote control
+	timer_init();		// Init robot loop timer
+
 }
 
 void uninit_sys() {
@@ -160,8 +161,8 @@ void background() {
 		switch (current_state.state) {
 		case RBS_WAIT_FOR_START_CMD:
 			// Update time to new value
-			delta_time.tv_sec = 0;
-			delta_time.tv_nsec = 500E6;
+			delta_time.tv_sec = LED_SLOW_PULSE_SEC;
+			delta_time.tv_nsec = LED_SLOW_PULSE_NSEC;
 
 			prev_time = current_time + delta_time;
 
@@ -171,15 +172,24 @@ void background() {
 			LED2_PIN.writePin(true);
 
 			break;
-//		case RBS_REMOTE:
+		case RBS_REMOTE:
+			// Update time to new value
+			delta_time.tv_sec = LED_SLOW_PULSE_SEC;
+			delta_time.tv_nsec = LED_SLOW_PULSE_NSEC;
 
+			prev_time = current_time + delta_time;
 
-//			break;
+			led = !led;
+
+			LED1_PIN.writePin(led);
+			LED2_PIN.writePin(led);
+
+			break;
 		case RBS_START_DELAY:
 		case RBS_PAUSED:
 			// Update time to new value
-			delta_time.tv_sec = 0;
-			delta_time.tv_nsec = 100E6;
+			delta_time.tv_sec = LED_FAST_PULSE_SEC;
+			delta_time.tv_nsec = LED_FAST_PULSE_NSEC;
 
 			prev_time = current_time + delta_time;
 
@@ -205,8 +215,8 @@ void background() {
 			break;
 		case RBS_FINISHED:
 			// Update time to new value
-			delta_time.tv_sec = 0;
-			delta_time.tv_nsec = 500E6;
+			delta_time.tv_sec = LED_SLOW_PULSE_SEC;
+			delta_time.tv_nsec = LED_SLOW_PULSE_NSEC;
 
 			prev_time = current_time + delta_time;
 
@@ -220,9 +230,6 @@ void background() {
 
 			break;
 		}
-
-		// Update to new time
-
 	}
 }
 
@@ -234,10 +241,14 @@ void robot_run(union sigval arg) {
 	// Get the current time
 	clock_gettime(CLOCK_BOOTTIME, &current_time);
 
+	// Read Sensors
+	update_sensor_values();
+
 	switch (current_state.state) {
 	case RBS_WAIT_FOR_START_CMD:
 		// Wait for start button
 		if ((START_BUTTON_PIN.readPin() == false) or (prgm_vars.disableStartButton == true)) {
+//		if (prgm_vars.disableStartButton == true) {
 			// Set starting point
 			current_waypoint = route.first();
 
@@ -259,10 +270,6 @@ void robot_run(union sigval arg) {
 		break;
 	case RBS_REMOTE:
 		if (current_state.remote_enabled == true) {
-			// Set current speed and direction
-			current_state.speedCommand = remote_speed_command;
-			current_state.directionCommand = remote_direction_command;
-
 			 // Update the current location
 			update_location(&current_state.posistion, current_state.sensors.encoders.leftTick, current_state.sensors.encoders.rightTick);
 
@@ -276,7 +283,7 @@ void robot_run(union sigval arg) {
 			printf("==Remote Disabled==\n");
 
 			// Go to finished state
-			current_state.state = RBS_FINISHED;
+			current_state.state = RBS_WAIT_FOR_START_CMD;
 		}
 
 		break;
@@ -302,9 +309,6 @@ void robot_run(union sigval arg) {
 		} else {
 			// Maintain current speed
 			current_state.speedCommand = prgm_vars.defaultSpeed;
-
-			// Read Sensors
-			update_sensor_values();
 
 			 // Update the current location
 			update_location(&current_state.posistion, current_state.sensors.encoders.leftTick, current_state.sensors.encoders.rightTick);

@@ -17,6 +17,7 @@
 
 #include "remote.h"
 #include "robot.h"
+#include "crc.h"
 
 double remote_speed_command;
 double remote_direction_command;
@@ -25,7 +26,7 @@ int listenfd = 0;
 int connection_fd = 0;
 
 //
-// Start and stop the listening for remotes
+// Start and stop the listening for remote
 //
 
 void remote_init() {
@@ -65,8 +66,7 @@ void process_remote() {
 	char sendBuff[255];
 	char recvBuff[255];
 
-	unsigned recvLength;
-	unsigned sendLength;
+	int recvLength;
 
 	// Initialize the send buffer to all '0'
 	memset(sendBuff, '0', sizeof(sendBuff));
@@ -74,19 +74,115 @@ void process_remote() {
 	// Accept new connections
 	accept_connection();
 
-	// Read the incoming buffer
-	recvLength = remote_receive(recvBuff, sizeof(recvBuff));
+	// Read and process incoming buffer
+	if ((recvLength = remote_receive(recvBuff, sizeof(recvBuff))) > 0) {
+		while (recvLength > 0) {
+			recvLength = process_command(recvBuff, recvLength);
+		}
+	}
+}
 
-	// Verify Checksum
-	if (recvBuff[recvLength - 1] == crc8(recvBuff, recvLength - 1)) {
-		// Process commands
-		printf(recvBuff);
+int process_command(char *buf, size_t len) {
+	CommandMessages rmt_cmd = (CommandMessages) buf[0];
+	unsigned int cmd_len = CommandSize(rmt_cmd);
+
+/*
+	for (unsigned int i = 0; i < cmd_len; i++) {
+		printf("Byte %i: %x\n", i, buf[i]);
+	}
+*/
+
+	// Check if enough bytes have been received
+	if (len >= cmd_len) {
+		// Verify checksum
+		if (verify_crc(buf, cmd_len, 0x0000)) {
+			// Process command
+			switch (rmt_cmd) {
+			// General Get Commands
+			case RMT_GET_STATUS:
+				break;
+			case RMT_GET_CONFIGURATION:
+				break;
+			// Get Motion Commands
+			case RMT_GET_SPEED_COMMAND:
+				break;
+			case RMT_GET_DIR_COMMAND:
+				break;
+			case RMT_GET_POSITION:
+				break;
+			case RMT_GET_HEADING:
+				break;
+			case RMT_GET_SPEED:
+				break;
+			// Get Waypoint Commands
+			case RMT_GET_CRNT_WAYPOINT:
+				break;
+			case RMT_GET_NEXT_WAYPOINT:
+				break;
+			case RMT_GET_PREV_WAYPOINT:
+				break;
+			case RMT_GET_FIRST_WAYPOINT:
+				break;
+			case RMT_GET_LAST_WAYPOINT:
+				break;
+			case RMT_GET_WAYPOINT_COUNT:
+				break;
+			case RMT_GET_WAYPOINT_N:
+				break;
+			// Get Set Commands
+			case RMT_SET_CONFIGUTATION:
+				current_state.remote_enabled = buf[1] & RMT_CONFIG_ENABLED;
+
+				break;
+			// Set Motion Commands
+			case RMT_SET_SPEED_COMMAND:
+				current_state.speedCommand = (signed char) buf[1];
+
+				break;
+			case RMT_SET_DIR_COMMAND:
+				current_state.directionCommand = (signed char) -buf[1];
+
+				break;
+			case RMT_SET_POSITION:
+				break;
+			case RMT_SET_HEADING:
+				break;
+			// Set Waypoint Commands
+			case RMT_SET_CRNT_WAYPOINT:
+				break;
+			case RMT_APPEND_WAYPOINT:
+				break;
+			case RMT_INSERT_WAYPOINT:
+				break;
+			case RMT_DELETE_WAYPOINT:
+				break;
+			default:
+				// Invalid command, flush buffer
+				len = 0;
+
+				break;
+			}
+
+			// Calc new length
+			len -= cmd_len;
+
+			// Shift buffer
+			memmove(buf, buf + cmd_len, len);
+		} else {
+			printf("Remote: Checksum Error");
+
+			// Flush buffer on error
+			len = 0;
+		}
 	} else {
-		printf("Remote CRC error.");
+		printf("Remote: Length Error");
+
+		// Flush buffer on error
+		len = 0;
 	}
 
-	// Send the response
-	remote_send(sendBuff, sizeof(sendBuff));
+	// Return length of buffer after command is processed
+	return len;
 }
 
 void accept_connection() {
@@ -101,17 +197,11 @@ void accept_connection() {
 	}
 }
 
-size_t remote_receive(char *buf, size_t len) {
-	size_t n;
+int remote_receive(char *buf, size_t len) {
+	int n;
 
 	if (connection_fd > 0) {
-		while ((n = recv(connection_fd, buf, len - 1, MSG_DONTWAIT)) > 0) {
-			buf[n] = 0;
-
-			if(fputs(buf, stdout) == EOF) {
-				printf("\n Error : Fputs error\n");
-			}
-		}
+		n = recv(connection_fd, buf, len, MSG_DONTWAIT);
 	}
 
 	return n;
@@ -119,6 +209,66 @@ size_t remote_receive(char *buf, size_t len) {
 
 void remote_send(const char *buf, size_t len) {
 	write(connection_fd, buf, len);
+}
+
+unsigned int CommandSize(CommandMessages rmt_cmd) {
+	unsigned int rtn = 0;
+
+	switch (rmt_cmd) {
+	// General Get Commands
+	case RMT_GET_STATUS:
+		break;
+	case RMT_GET_CONFIGURATION:
+		break;
+	// Get Motion Commands
+	case RMT_GET_SPEED_COMMAND:
+		break;
+	case RMT_GET_DIR_COMMAND:
+		break;
+	case RMT_GET_POSITION:
+		break;
+	case RMT_GET_HEADING:
+		break;
+	case RMT_GET_SPEED:
+		break;
+	// Get Waypoint Commands
+	case RMT_GET_CRNT_WAYPOINT:
+		break;
+	case RMT_GET_NEXT_WAYPOINT:
+		break;
+	case RMT_GET_PREV_WAYPOINT:
+		break;
+	case RMT_GET_FIRST_WAYPOINT:
+		break;
+	case RMT_GET_LAST_WAYPOINT:
+		break;
+	case RMT_GET_WAYPOINT_COUNT:
+		break;
+	case RMT_GET_WAYPOINT_N:
+		break;
+	// Get Set Commands
+	case RMT_SET_CONFIGUTATION:
+	case RMT_SET_SPEED_COMMAND:
+	case RMT_SET_DIR_COMMAND:
+		rtn = 4;
+
+		break;
+	case RMT_SET_POSITION:
+		break;
+	case RMT_SET_HEADING:
+		break;
+	// Set Waypoint Commands
+	case RMT_SET_CRNT_WAYPOINT:
+		break;
+	case RMT_APPEND_WAYPOINT:
+		break;
+	case RMT_INSERT_WAYPOINT:
+		break;
+	case RMT_DELETE_WAYPOINT:
+		break;
+	}
+
+	return rtn;
 }
 
 char crc8(const char *buf, size_t len) {
