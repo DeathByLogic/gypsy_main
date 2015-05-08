@@ -4,6 +4,7 @@
 #include <stdio.h>
 
 #include "debug.h"
+#include "global.h"
 
 using namespace std;
 
@@ -33,7 +34,7 @@ void serial_write_location() {
 
 // Print location to debug window
 void debug_print_location(const Posistion posistion) {
-	printf("Location: x: %'.4f\ty: %'.4f\to: %'.4f\n", posistion.location.x, posistion.location.y, posistion.heading);
+	printf("Location: x: %'.4f\ty: %'.4f\to: %'.4f\n", posistion.location.x, posistion.location.y, posistion.heading * (180 / PI));
 }
 
 // Print path to debug

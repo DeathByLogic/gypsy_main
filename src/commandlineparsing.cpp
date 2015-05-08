@@ -29,7 +29,7 @@ void print_help() {
 	cout << " -d <sec> <msec>		Period to wait before moving in seconds and milliseconds " << endl;
 	cout << " -P <Kp> <Ki> <Kd>     PID parameters" << endl;
 	cout << " -T <sec> <msec>       PID loop time in seconds and milliseconds" << endl;
-	cout << " -r port               Remote port" << endl;
+	cout << " -r <port>             Remote port" << endl;
 }
 
 int process_arg(int argc, char *argv[]) {
