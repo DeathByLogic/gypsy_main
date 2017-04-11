@@ -5,12 +5,6 @@
 #include "global.h"
 #include "double_list.h"
 
-// Structure for each node
-typedef struct {
-  Point		location;	// Waypoint location
-  bool 		fixed;		// Is this a fixed waypoint
-} Waypoint;
-
 // Constant Definitions
 
 // Function Prototypes

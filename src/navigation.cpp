@@ -3,7 +3,7 @@
 #include "navigation.h"
 
 // Robot Route
-DoubleList<Waypoint> route;
+WaypointList route;
 
 // Current waypoint
 DoubleNode<Waypoint> *current_waypoint;

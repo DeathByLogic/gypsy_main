@@ -6,10 +6,6 @@ class DoubleList;
 
 template <typename Object>
 class DoubleNode {
-  private:
-    DoubleNode  *prev_node;
-    DoubleNode  *next_node;
-
   public:
     // Constructor
     DoubleNode( const Object & = Object(), DoubleNode * = 0, DoubleNode * = 0 );
@@ -22,6 +18,10 @@ class DoubleNode {
     DoubleNode *next() const;
 
     friend class DoubleList<Object>;
+	
+  private:
+    DoubleNode  *prev_node;
+    DoubleNode  *next_node;
 };
 
 // Class constructor

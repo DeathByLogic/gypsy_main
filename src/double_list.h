@@ -1,6 +1,7 @@
 #ifndef _DOUBLE_LIST_H
 #define _DOUBLE_LIST_H
 
+#include <iostream>
 #include "double_node.h"
 
 template<typename Object>
@@ -36,6 +37,8 @@ class DoubleList {
     // Remove first or last node
     void removeFirst();
     void removeLast();
+	
+	virtual void print();
     
   private:
     // Number of nodes in list
@@ -262,6 +265,12 @@ void DoubleList<Object>::removeFirst() {
 template<typename Object>
 void DoubleList<Object>::removeLast() {
   remove(lastNode);
+}
+
+// Print list
+template<typename Object>
+void DoubleList<Object>::print() {
+	cerr << "Error. Print not available for base type." <<  endl;
 }
 
 #endif

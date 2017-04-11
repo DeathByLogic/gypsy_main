@@ -19,6 +19,7 @@
 #define MAP(value, in_min, in_max, out_min, out_max) ((value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min)
 
 // Type Definitions
+/*
 typedef struct {
 	float		x;
 	float		y;
@@ -27,7 +28,8 @@ typedef struct {
 typedef struct {
 	Point		location;
 	float		heading;
-} Posistion;
+} Position;
+*/
 
 // Functions
 timespec operator+(const timespec &a, const timespec &b);
