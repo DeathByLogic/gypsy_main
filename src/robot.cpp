@@ -17,6 +17,7 @@
 #include "commandlineparsing.h"
 #include "remote.h"
 #include "sensors.h"
+#include "localization.h"
 
 // Current Robot State
 RobotVariables		current_state;
@@ -55,8 +56,8 @@ void init_vars() {
 	// Set robot initial state
 	current_state.speedCommand = 0.0;
 	current_state.directionCommand = 0.0;
-	current_state.remote_enabled = false;
-	current_state.state = RBS_WAIT_FOR_START_CMD;
+	current_state.remote_enabled = true;//false;
+	current_state.state = RBS_REMOTE;//RBS_WAIT_FOR_START_CMD;
 
 	// Initialize program variables
 	prgm_vars.PIDLoopPeriod.tv_sec = DEFAULT_PID_PERIOD_SEC;
@@ -78,7 +79,7 @@ void init_sys() {
 	robot_init();		// Init robot pins and setting
 	pid_init();			// Init PID control loop
 	motor_init();		// Init motor control
-//	encoders_init();	// Init wheel encoders
+	localize_init();	// Init localization
 	debug_init();		// Init debug features
 	remote_init();		// Init remote control
 	timer_init();		// Init robot loop timer
@@ -87,7 +88,6 @@ void init_sys() {
 
 void uninit_sys() {
 	timer_uninit();		// Uninit PID control loop
-//	encoders_uninit();	// Uninit wheel encoders
 	remote_uninit();	// Uninit remote server
 
 	// Turn off LEDs
@@ -242,13 +242,13 @@ void robot_run(union sigval arg) {
 	clock_gettime(CLOCK_BOOTTIME, &current_time);
 
 	// Read Sensors
-	update_sensor_values();
+	//sensor_update(current_time);
 
 	switch (current_state.state) {
 	case RBS_WAIT_FOR_START_CMD:
 		// Wait for start button
-		if ((START_BUTTON_PIN.readPin() == false) or (prgm_vars.disableStartButton == true)) {
-//		if (prgm_vars.disableStartButton == true) {
+//		if ((START_BUTTON_PIN.readPin() == false) or (prgm_vars.disableStartButton == true)) {
+		if (prgm_vars.disableStartButton == true) {
 			// Set starting point
 			current_waypoint = route.first();
 
@@ -275,6 +275,9 @@ void robot_run(union sigval arg) {
 
 			// Update the current speed
 			update_speed(&current_state.speed, current_state.sensors.encoders.leftPeriod, current_state.sensors.encoders.rightPeriod);
+
+			// Localize
+			localize();
 		} else {
 			// Stop Movement
 			current_state.speedCommand = 0.0;

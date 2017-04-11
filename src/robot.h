@@ -3,11 +3,11 @@
 
 #include <signal.h>
 #include <time.h>
+#include <gsl/gsl_matrix.h>
 
 #include "pid.h"
 #include "navigation.h"
 #include "beagleGPIO.h"
-
 
 // Constants
 #define START_BUTTON_PIN			P9_24
@@ -89,9 +89,15 @@ typedef struct {
 } WheelEncoders;
 
 typedef struct {
+	long					quality;
+	long					distance;
+} LidarSensor;
+
+typedef struct {
 	float					front;
 	float					left;
 	float					right;
+	LidarSensor				lidar[360];
 } DistanceSensors;
 
 typedef struct {
@@ -107,6 +113,8 @@ typedef struct {
 	bool					remote_enabled;
 	RobotStates				state;
 	RobotSensors			sensors;
+	gsl_matrix				*objectMap;
+	gsl_matrix				*locationMap;
 } RobotVariables;
 
 // External variables

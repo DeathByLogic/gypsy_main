@@ -45,3 +45,7 @@ void motor_update(int speed_command, int direction_command) {
   ST.drive(motor_speed);
   ST.turn(motor_direction);
 }
+
+void motor_paused(bool paused) {
+	HBRIDGE_SHUTDOWN.writePin(!paused);
+}

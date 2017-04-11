@@ -140,7 +140,7 @@ int process_command(char *buf, size_t len) {
 
 				break;
 			case RMT_SET_DIR_COMMAND:
-				current_state.directionCommand = (signed char) -buf[1];
+				current_state.directionCommand = (signed char)buf[1];
 
 				break;
 			case RMT_SET_POSITION:
