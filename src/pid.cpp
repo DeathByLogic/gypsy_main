@@ -5,7 +5,6 @@
 #include <cmath>
 
 #include "global.h"
-#include "debug.h"
 
 #include "PID_v1.h"
 //#include <PID_AutoTune_v0.h>
@@ -83,7 +82,7 @@ float calculate_cte(DoubleNode<Waypoint> *&node, const Point location) {
 			node = node->next();
 
 			printf("Reached Waypoint: ");
-			debug_print_waypoint(node);
+			node->value.print();
 		}
 
 		// Calculate cte

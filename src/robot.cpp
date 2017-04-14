@@ -12,10 +12,11 @@
 #include "encoders.h"
 #include "robot.h"
 #include "navigation.h"
-#include "debug.h"
 #include "beagleIO.h"
 #include "commandlineparsing.h"
 #include "sensors.h"
+
+using namespace std;
 
 // Current Robot State
 RobotVariables		current_state;
@@ -66,8 +67,8 @@ void init_vars() {
 	prgm_vars.locationMsgPeriod.tv_nsec = DEFAULT_BKG_PERIOD_NSEC;
 	prgm_vars.startDelayPeriod.tv_sec = DEFAULT_START_DELAY_SEC;
 	prgm_vars.startDelayPeriod.tv_nsec = DEFAULT_START_DELAY_NSEC;
-	prgm_vars.startPosistion.location = {0.0, 0.0};
-	prgm_vars.startPosistion.heading = 0.0;
+	prgm_vars.startPosition.location = {0.0, 0.0};
+	prgm_vars.startPosition.heading = 0.0;
 }
 
 // Program Setup Function
@@ -76,7 +77,6 @@ void init_sys() {
 	pid_init();			// Init PID control loop
 	motor_init();		// Init motor control
 //	encoders_init();	// Init wheel encoders
-	debug_init();		// Init debug features
 	timer_init();		// Init robot loop timer
 }
 
@@ -184,7 +184,7 @@ void background() {
 
 			if ((prgm_vars.locationMsgPeriod.tv_sec > 0) or (prgm_vars.locationMsgPeriod.tv_nsec > 0)) {
 				// Print location
-				debug_print_location(current_state.posistion);
+				current_state.position.print();
 
 				// Update time to new value
 				prev_time = current_time + prgm_vars.locationMsgPeriod;
@@ -230,7 +230,7 @@ void robot_run(union sigval arg) {
 			current_waypoint = route.first();
 
 			// Set robot initial position
-			current_state.posistion = prgm_vars.startPosistion;
+			current_state.position = prgm_vars.startPosition;
 
 			// Update start delay time to new value
 			start_delay_time = current_time + prgm_vars.startDelayPeriod;
@@ -267,13 +267,13 @@ void robot_run(union sigval arg) {
 			update_sensor_values();
 
 			 // Update the current location
-			update_location(&current_state.posistion, current_state.sensors.encoders.leftTick, current_state.sensors.encoders.rightTick);
+			update_location(&current_state.position, current_state.sensors.encoders.leftTick, current_state.sensors.encoders.rightTick);
 
 			// Update the current speed
 			update_speed(&current_state.speed, current_state.sensors.encoders.leftPeriod, current_state.sensors.encoders.rightPeriod);
 
 			// Calculate the error value
-			ct_error = calculate_cte(current_waypoint, current_state.posistion.location);
+			ct_error = calculate_cte(current_waypoint, current_state.position.location);
 
 			// Run the control loop
 			pid_control_loop();
@@ -296,7 +296,7 @@ void robot_run(union sigval arg) {
 		current_state.speedCommand = 0.0;
 
 		// Update the current location
-		update_location(&current_state.posistion, current_state.sensors.encoders.leftTick, current_state.sensors.encoders.rightTick);
+		update_location(&current_state.position, current_state.sensors.encoders.leftTick, current_state.sensors.encoders.rightTick);
 
 		// If Emergency button is released, resume
 		if (PAUSE_BUTTON_PIN.readPin() == true) {
@@ -338,11 +338,17 @@ void robot_run(union sigval arg) {
 
 // Load a path into the route
 void load_path() {
-	fill_route(&route, box_path, 16);
+	// Add waypoints to route
+	route.add(box_path, 16);
 
-	debug_print_path(&route);
+	// Print out path
+	printf("== Original Path Data ==\n");
+	route.print();
 
-	//smooth_path(&route, 0.00001, 0.5, 0.25);
+	// Smooth route
+	//route.smooth(0.00001, 0.5, 0.25);
 
-	//debug_print_path(&route);
+	// Print smoothed route
+	printf("== Smoothed Path Data ==\n");
+	route.print();
 }

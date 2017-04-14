@@ -7,10 +7,10 @@
 template<typename Object>
 class DoubleList {
   public:
-    // Constructor and Destructor
+    // Constructor & Deconstructor
     DoubleList();
-    ~DoubleList();
-    
+    virtual ~DoubleList();
+
     // Return node count 
     int count() const;
     bool empty() const;
@@ -270,7 +270,7 @@ void DoubleList<Object>::removeLast() {
 // Print list
 template<typename Object>
 void DoubleList<Object>::print() {
-	cerr << "Error. Print not available for base type." <<  endl;
+	std::cerr << "Error. Print not available for base type." <<  std::endl;
 }
 
 #endif

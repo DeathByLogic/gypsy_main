@@ -1,5 +1,6 @@
 #include <stdlib.h>
 
+#include "waypoint_list.h"
 #include "navigation.h"
 
 // Robot Route

@@ -1,6 +1,7 @@
 #ifndef _PID_H
 #define _PID_H
 
+#include "waypoint.h"
 #include "navigation.h"
 #include "double_list.h"
 

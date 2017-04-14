@@ -4,6 +4,7 @@
 #include <signal.h>
 #include <time.h>
 
+#include "position.h"
 #include "pid.h"
 #include "navigation.h"
 #include "beagleGPIO.h"
@@ -49,7 +50,7 @@ typedef struct {
 	timespec				startDelayPeriod;			// Wait for n number of ms before starting movement
 	timespec				locationMsgPeriod;			// n number of ms between printing of location messages
 	float					defaultSpeed;				// The default speed of the robot
-	Posistion				startPosistion;				// The starting position of the robot
+	Position				startPosition;				// The starting position of the robot
 	PIDParam				PIDValues;					// The Kp, Ki and Kd values
 	timespec				PIDLoopPeriod;				// The PID loop period
 } ProgramVariables;
@@ -92,7 +93,7 @@ typedef struct {
 } RobotSensors;
 
 typedef struct {
-	Posistion				posistion;
+	Position				position;
 	float					speed;
 	double					speedCommand;
 	double					directionCommand;

@@ -47,13 +47,13 @@ int process_arg(int argc, char *argv[]) {
 		} else if (strcmp(argv[count], "-p") == 0) {
 			// Robot starting position
 			if (count + 2 <= argc) {
-				prgm_vars.startPosistion.location.x = strtof(argv[++count], NULL);
-				prgm_vars.startPosistion.location.y = strtof(argv[++count], NULL);
+				prgm_vars.startPosition.location.x = strtof(argv[++count], NULL);
+				prgm_vars.startPosition.location.y = strtof(argv[++count], NULL);
 			}
 		} else if (strcmp(argv[count], "-h") == 0) {
 			// Robot starting heading
 			if (count + 1 <= argc) {
-				prgm_vars.startPosistion.heading = strtof(argv[++count], NULL);
+				prgm_vars.startPosition.heading = strtof(argv[++count], NULL);
 			}
 		} else if (strcmp(argv[count], "-l") == 0) {
 			// Location message period in milliseconds

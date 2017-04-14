@@ -1,7 +1,7 @@
 #ifndef _POINT_H
 #define _POINT_H
 
-#include <stdio>
+#include <cstdio>
 
 class Point {
   public:
@@ -10,11 +10,9 @@ class Point {
     float y;
 	
 	// Print location
-	void print();
-}
-
-void Waypoint::print() {
-	printf("x: %'.4f\ty: %'.4f", x, y);
-}
+	void print() {
+	  printf("x: %'.4f\ty: %'.4f", x, y);
+	};
+};
 
 #endif

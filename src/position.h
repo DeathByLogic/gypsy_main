@@ -1,21 +1,22 @@
 #ifndef _POSITION_H
 #define _POSITION_H
 
-#include <stdio>
 #include "point.h"
+#include <cstdio>
 
 class Position {
   public:
     // X & Y location & heading
-	Point location
-	float heading
+	Point location;
+	float heading;
 	
 	// Print location
-	void print();
-}
+	void print() {
+	  printf("Location: x: %'.4f\ty: %'.4f\to: %'.4f\n", location.x, location.y, heading);
+	};
 
-void Waypoint::print() {
-		printf("Location: x: %'.4f\ty: %'.4f\to: %'.4f\n", location.x, location.y, heading);
-}
+  private:
+
+};
 
 #endif

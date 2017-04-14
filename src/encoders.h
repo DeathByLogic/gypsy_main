@@ -8,10 +8,12 @@
 
 #define PERIOD_DIVIDER		1E6			// Microseconds per second
 
+#include "position.h"
+
 //Function Prototypes
 void encoders_init();
 void encoders_uninit();
-void update_location(Posistion *, const long, const long);
+void update_location(Position *, const long, const long);
 void update_speed(float *speed, unsigned long left_period, unsigned long right_period);
 
 // External Variables
