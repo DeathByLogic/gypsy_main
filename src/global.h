@@ -9,7 +9,7 @@
 #define GLOBAL_H_
 
 // Includes
-#include <time.h>
+#include <ctime>
 
 // Constant Definitions
 #define PI				(float)3.14159

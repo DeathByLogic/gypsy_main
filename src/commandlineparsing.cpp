@@ -6,10 +6,10 @@
  */
 
 #include <cstdlib>
-#include <unistd.h>
 #include <cstdio>
 #include <cstring>
 #include <iostream>
+#include <unistd.h>
 
 #include "commandlineparsing.h"
 #include "robot.h"

@@ -1,4 +1,4 @@
-#include <stdlib.h>
+#include <cstdlib>
 
 #include "waypoint_list.h"
 #include "navigation.h"

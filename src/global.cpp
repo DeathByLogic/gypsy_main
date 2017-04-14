@@ -1,4 +1,5 @@
-#include <stdio.h>
+#include <cstdio>
+
 #include "global.h"
 
 using namespace std;

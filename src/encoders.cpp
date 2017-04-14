@@ -1,8 +1,8 @@
+#include <cmath>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <unistd.h>
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #include "position.h"
 #include "beagleIO.h"

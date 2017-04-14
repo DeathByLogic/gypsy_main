@@ -1,8 +1,8 @@
 #ifndef _POSITION_H
 #define _POSITION_H
 
-#include "point.h"
 #include <cstdio>
+#include "point.h"
 
 class Position {
   public:

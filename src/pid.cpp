@@ -1,8 +1,8 @@
-#include <iostream>
-#include <stdlib.h>
-#include <unistd.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdio>
 #include <cmath>
+#include <iostream>
+#include <unistd.h>
 
 #include "global.h"
 

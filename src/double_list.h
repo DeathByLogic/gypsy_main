@@ -2,6 +2,7 @@
 #define _DOUBLE_LIST_H
 
 #include <iostream>
+
 #include "double_node.h"
 
 template<typename Object>

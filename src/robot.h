@@ -1,8 +1,7 @@
 #ifndef _ROBOT_H
 #define _ROBOT_H
 
-#include <signal.h>
-#include <time.h>
+#include <ctime>
 
 #include "position.h"
 #include "pid.h"

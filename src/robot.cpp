@@ -1,10 +1,8 @@
-#include <stdlib.h>
-#include <unistd.h>
-#include <stdio.h>
-#include <iostream>
-#include <signal.h>
-#include <time.h>
-#include <string.h>
+#include <cstdlib>
+#include <cstdio>
+#include <ctime>
+#include <csignal>
+#include <cstring>
 
 #include "global.h"
 #include "pid.h"
