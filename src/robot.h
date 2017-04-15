@@ -3,7 +3,7 @@
 
 #include <ctime>
 
-#include "position.h"
+#include "classes/position.h"
 #include "pid.h"
 #include "navigation.h"
 #include "beagleGPIO.h"

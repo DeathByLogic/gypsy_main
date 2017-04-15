@@ -1,9 +1,10 @@
 #ifndef _PID_H
 #define _PID_H
 
-#include "waypoint.h"
+#include "classes/waypoint.h"
+#include "classes/double_list.h"
 #include "navigation.h"
-#include "double_list.h"
+
 
 // Constant Definitions
 #define SAMPLE_PERIOD    100    // PID Loop period

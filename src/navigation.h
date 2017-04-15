@@ -2,15 +2,15 @@
 #define _NAVIGATION_H
 
 // Includes
-#include "waypoint_list.h"
+#include "classes/waypoint.h"
+#include "classes/waypoint_list.h"
+#include "classes/double_node.h"
 #include "global.h"
-#include "double_list.h"
+
 
 // Constant Definitions
 
 // Function Prototypes
-void smooth_path(DoubleList<Waypoint> *, float, float, float);
-void fill_route(DoubleList<Waypoint> *, const Waypoint *, const int);
 
 // External Variables
 extern WaypointList route;

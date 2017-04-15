@@ -1,4 +1,5 @@
 #include <cstdio>
+#include <ctime>
 
 #include "global.h"
 

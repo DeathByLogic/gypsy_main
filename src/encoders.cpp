@@ -4,7 +4,7 @@
 #include <cstring>
 #include <unistd.h>
 
-#include "position.h"
+#include "classes/position.h"
 #include "beagleIO.h"
 #include "robot.h"
 #include "global.h"

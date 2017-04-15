@@ -8,7 +8,7 @@
 
 #define PERIOD_DIVIDER		1E6			// Microseconds per second
 
-#include "position.h"
+#include "classes/position.h"
 
 //Function Prototypes
 void encoders_init();

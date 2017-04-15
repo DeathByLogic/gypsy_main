@@ -28,6 +28,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/BeagleIO/src}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/arm-linux-gnueabihf/include"/>
 								</option>
+								<option id="gnu.c.compiler.option.misc.other.140443055" name="Other flags" superClass="gnu.c.compiler.option.misc.other" value="-c -fmessage-length=0 -std=gnu99" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1277087995" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.cross.cpp.compiler.635832466" name="Cross G++ Compiler" superClass="cdt.managedbuild.tool.gnu.cross.cpp.compiler">
@@ -38,7 +39,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/BeagleIO/src}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/arm-linux-gnueabihf/include/c++/4.8.4"/>
 								</option>
-								<option id="gnu.cpp.compiler.option.other.other.1570066929" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -std=gnu++11" valueType="string"/>
+								<option id="gnu.cpp.compiler.option.other.other.1570066929" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 -std=gnu++11" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.802177927" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.cross.c.linker.1780777763" name="Cross GCC Linker" superClass="cdt.managedbuild.tool.gnu.cross.c.linker"/>
@@ -140,24 +141,6 @@
 							</tool>
 						</toolChain>
 					</folderInfo>
-					<fileInfo id="cdt.managedbuild.config.gnu.cross.exe.release.1868689768.1432479411" name="sensors.c" rcbsApplicability="disable" resourcePath="src/sensors.cpp" toolsToInvoke="cdt.managedbuild.tool.gnu.cross.c.compiler.51224514.2020657321">
-						<tool id="cdt.managedbuild.tool.gnu.cross.c.compiler.51224514.2020657321" name="Cross GCC Compiler" superClass="cdt.managedbuild.tool.gnu.cross.c.compiler.51224514">
-							<option id="gnu.c.compiler.option.include.paths.1159850235" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
-								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/BeagleIO}&quot;"/>
-								<listOptionValue builtIn="false" value="&quot;${workspace_loc:/BeagleIO/src}&quot;"/>
-								<listOptionValue builtIn="false" value="/usr/arm-linux-gnueabihf/include"/>
-							</option>
-							<option id="gnu.c.compiler.option.preprocessor.def.symbols.540772779" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" valueType="definedSymbols">
-								<listOptionValue builtIn="false" value="__GNUC_PATCHLEVEL__=4"/>
-								<listOptionValue builtIn="false" value="__VERSION__=&quot;4.8.4&quot;"/>
-							</option>
-							<option id="gnu.c.compiler.option.preprocessor.undef.symbol.1902680911" name="Undefined symbols (-U)" superClass="gnu.c.compiler.option.preprocessor.undef.symbol" valueType="undefDefinedSymbols">
-								<listOptionValue builtIn="false" value="__VERSION__"/>
-								<listOptionValue builtIn="false" value="__GNUC_PATCHLEVEL__"/>
-							</option>
-							<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.912694460" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
-						</tool>
-					</fileInfo>
 				</configuration>
 			</storageModule>
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>

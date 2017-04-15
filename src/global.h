@@ -18,19 +18,6 @@
 #define CONSTRAIN(amt, low, high) ((amt)<(low)?(low):((amt)>(high)?(high):(amt)))
 #define MAP(value, in_min, in_max, out_min, out_max) ((value - in_min) * (out_max - out_min) / (in_max - in_min) + out_min)
 
-// Type Definitions
-/*
-typedef struct {
-	float		x;
-	float		y;
-} Point;
-
-typedef struct {
-	Point		location;
-	float		heading;
-} Position;
-*/
-
 // Functions
 timespec operator+(const timespec &a, const timespec &b);
 timespec operator-(const timespec &a, const timespec &b);

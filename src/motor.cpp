@@ -1,5 +1,5 @@
+#include "classes/Sabertooth.h"
 #include "beagleIO.h"
-#include "Sabertooth.h"
 #include "global.h"
 #include "motor.h"
 
