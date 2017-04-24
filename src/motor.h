@@ -24,5 +24,6 @@
 // Function Prototypes
 void motor_init();
 void motor_update(int, int);
+void update_motor();
 
 #endif

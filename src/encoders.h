@@ -13,8 +13,9 @@
 //Function Prototypes
 void encoders_init();
 void encoders_uninit();
-void update_location(Position *, const long, const long);
-void update_speed(float *speed, unsigned long left_period, unsigned long right_period);
+
+Position update_location(const Position current_position, const long left_delta, const long right_delta);
+float update_speed(const unsigned long left_period, const unsigned long right_period);
 
 // External Variables
 

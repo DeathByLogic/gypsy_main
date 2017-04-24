@@ -23,15 +23,15 @@ void update_sensor_values() {
 //	read_sensor(&rightSensor, sizeof(rightSensor), RIGHT_SENSOR_ADR);
 
 	// Update values in main program variables
-	current_state.sensors.distance.left = leftSensor.avg_sensor[0];
-	current_state.sensors.encoders.leftTick = leftSensor.tick_count - prevLeftTickCount;
-	current_state.sensors.encoders.leftPeriod = leftSensor.tick_period;
+	next_state.sensors.distance.left = leftSensor.avg_sensor[0];
+	next_state.sensors.encoders.leftTick = leftSensor.tick_count - prevLeftTickCount;
+	next_state.sensors.encoders.leftPeriod = leftSensor.tick_period;
 
-	current_state.sensors.distance.right = rightSensor.avg_sensor[0];
-	current_state.sensors.encoders.rightTick = rightSensor.tick_count - prevRightTickCount;
-	current_state.sensors.encoders.rightPeriod = rightSensor.tick_period;
+	next_state.sensors.distance.right = rightSensor.avg_sensor[0];
+	next_state.sensors.encoders.rightTick = rightSensor.tick_count - prevRightTickCount;
+	next_state.sensors.encoders.rightPeriod = rightSensor.tick_period;
 
-	current_state.sensors.distance.front = 0;
+	next_state.sensors.distance.front = 0;
 
 	// Update previous tick counts
 	prevLeftTickCount = leftSensor.tick_count;

@@ -1,11 +1,6 @@
 #ifndef _PID_H
 #define _PID_H
 
-#include "classes/waypoint.h"
-#include "classes/double_list.h"
-#include "navigation.h"
-
-
 // Constant Definitions
 #define SAMPLE_PERIOD    100    // PID Loop period
 
@@ -28,15 +23,5 @@ typedef struct {
 // Function Prototypes
 void pid_init();
 void pid_control_loop();
-float calculate_cte(DoubleNode<Waypoint> *&, const Point);
-//float calc_location_PID(PIDParam, float);
-//float calc_theta_PID(PIDParam, float);
-
-// External Variables
-extern double robot_speed;
-extern double robot_dir;
-
-extern double ct_error;
-extern double ct_target;
 
 #endif

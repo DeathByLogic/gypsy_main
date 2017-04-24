@@ -11,6 +11,9 @@
 // Constant Definitions
 
 // Function Prototypes
+float distance(const Point location, const Point destination);
+float cross_track_error(const Point location, const Point waypoint_a, const Point waypoint_b);
+bool past_waypoint(const Point location, const Point waypoint_a, const Point waypoint_b);
 
 // External Variables
 extern WaypointList route;

@@ -38,7 +38,9 @@ void load_path();
 
 void robot_init();
 void robot_run(union sigval arg);
-void robot_fsm();
+void robot_state();
+
+void read_buttons();
 
 void timer_init();
 void timer_uninit();
@@ -92,16 +94,39 @@ typedef struct {
 } RobotSensors;
 
 typedef struct {
+	bool					startButton;
+	bool					pauseButton;
+} RobotButtons;
+
+typedef struct {
+	double					ctTarget;
+	double					ctError;
+	double					command;
+} DirectionPID;
+
+typedef struct {
+	double					target;
+	double					command;
+} SpeedPID;
+
+typedef struct {
+	SpeedPID				speed;
+	DirectionPID			direction;
+} RobotMotors;
+
+typedef struct {
 	Position				position;
-	float					speed;
-	double					speedCommand;
-	double					directionCommand;
+	double					speed;
+	RobotMotors				motors;
 	RobotStates				state;
 	RobotSensors			sensors;
+	RobotButtons			buttons;
 } RobotVariables;
 
 // External variables
 extern ProgramVariables		prgm_vars;
+
 extern RobotVariables		current_state;
+extern RobotVariables		next_state;
 
 #endif

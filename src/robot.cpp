@@ -3,6 +3,7 @@
 #include <ctime>
 #include <csignal>
 #include <cstring>
+#include <thread>
 
 #include "global.h"
 #include "pid.h"
@@ -18,6 +19,7 @@ using namespace std;
 
 // Current Robot State
 RobotVariables		current_state;
+RobotVariables		next_state;
 
 // Global program Variables
 ProgramVariables	prgm_vars;
@@ -51,9 +53,11 @@ int main(int argc, char *argv[]) {
 
 void init_vars() {
 	// Set robot initial state
-	current_state.speedCommand = 0.0;
-	current_state.directionCommand = 0.0;
-	current_state.state = RBS_WAIT_FOR_START_CMD;
+	next_state.motors.speed.target = 0.0;
+	next_state.motors.direction.ctTarget = 0.0;
+	next_state.state = RBS_WAIT_FOR_START_CMD;
+
+	current_state = next_state;
 
 	// Initialize program variables
 	prgm_vars.PIDLoopPeriod.tv_sec = DEFAULT_PID_PERIOD_SEC;
@@ -206,14 +210,36 @@ void background() {
 
 			break;
 		}
-
-		// Update to new time
-
 	}
 }
 
-// Main robot loop
+// Main robot timer interrupt
 void robot_run(union sigval arg) {
+	// Update the current state
+	current_state = next_state;
+
+	// Update motor output with previous calculations
+	motor_update(current_state.motors.speed.command, current_state.motors.direction.command);
+
+	// Read buttons for next state
+	read_buttons();
+
+	// Get sensor data for next state
+	update_sensor_values();
+
+	// Run the robot state machine
+	robot_state();
+}
+
+// Read button states
+void read_buttons() {
+	// Buttons are low when pushed so invert the state of the buttons
+	next_state.buttons.startButton = not START_BUTTON_PIN.readPin();
+	next_state.buttons.pauseButton = not PAUSE_BUTTON_PIN.readPin();
+}
+
+// Robot State Machine
+void robot_state() {
 	static timespec start_delay_time;
 	timespec current_time;
 
@@ -223,18 +249,18 @@ void robot_run(union sigval arg) {
 	switch (current_state.state) {
 	case RBS_WAIT_FOR_START_CMD:
 		// Wait for start button
-		if ((START_BUTTON_PIN.readPin() == false) or (prgm_vars.disableStartButton == true)) {
+		if ((current_state.buttons.startButton == true) or (prgm_vars.disableStartButton == true)) {
 			// Set starting point
 			current_waypoint = route.first();
 
 			// Set robot initial position
-			current_state.position = prgm_vars.startPosition;
+			next_state.position = prgm_vars.startPosition;
 
 			// Update start delay time to new value
 			start_delay_time = current_time + prgm_vars.startDelayPeriod;
 
 			// Set robot to delay mode
-			current_state.state = RBS_START_DELAY;
+			next_state.state = RBS_START_DELAY;
 		}
 
 		break;
@@ -244,63 +270,74 @@ void robot_run(union sigval arg) {
 			printf("==Starting Movement==\n");
 
 			// Set robot to movement mode
-			current_state.state = RBS_RUNNING;
+			next_state.state = RBS_RUNNING;
 		}
 
 		break;
 	case RBS_RUNNING:
-		if (current_waypoint == route.last()) {
-			// If at last waypoint stop
-			current_state.speedCommand = 0.0;
+		// Update the current location
+		next_state.position = update_location(current_state.position, current_state.sensors.encoders.leftTick, current_state.sensors.encoders.rightTick);
 
-			printf("== Stopping Movement ==\n");
+		// Update the current speed
+		next_state.speed = update_speed(current_state.sensors.encoders.leftPeriod, current_state.sensors.encoders.rightPeriod);
 
-			// Robot has finished the route
-			current_state.state = RBS_FINISHED;
+		// If Emergency button is pushed, pause robot
+		if (current_state.buttons.pauseButton == true) {
+			// Stop the robot
+			next_state.motors.speed.target = 0.0;
+
+			printf("== Pausing Movement ==\n");
+
+			// Set robot to paused state;
+			next_state.state = RBS_PAUSED;
 		} else {
-			// Maintain current speed
-			current_state.speedCommand = prgm_vars.defaultSpeed;
+			// Check if at or past current waypoint
+			if (past_waypoint(next_state.position.location, current_waypoint->value.location, current_waypoint->next()->value.location)) {
+				// Move to next waypoint
+				current_waypoint = current_waypoint->next();
 
-			// Read Sensors
-			update_sensor_values();
+				printf("Reached Waypoint: ");
+				current_waypoint->value.print();
+			}
 
-			 // Update the current location
-			update_location(&current_state.position, current_state.sensors.encoders.leftTick, current_state.sensors.encoders.rightTick);
+			// Check if at last waypoint
+			if (current_waypoint == route.last()) {
+				// If at last waypoint stop
+				next_state.motors.speed.target = 0.0;
 
-			// Update the current speed
-			update_speed(&current_state.speed, current_state.sensors.encoders.leftPeriod, current_state.sensors.encoders.rightPeriod);
+				printf("== Stopping Movement ==\n");
 
-			// Calculate the error value
-			ct_error = calculate_cte(current_waypoint, current_state.position.location);
+				// Robot has finished the route
+				next_state.state = RBS_FINISHED;
+			} else {
+				// Maintain default speed
+				next_state.motors.speed.target = prgm_vars.defaultSpeed;
 
-			// Run the control loop
-			pid_control_loop();
+				// Calculate the cross track error value
+				next_state.motors.direction.ctError = cross_track_error(next_state.position.location, current_waypoint->value.location, current_waypoint->next()->value.location);
 
-			// If Emergency button is pushed, pause robot
-			if (PAUSE_BUTTON_PIN.readPin() == false) {
-				// Set robot to paused state;
-				current_state.state = RBS_PAUSED;
+				// Run the control loop
+				pid_control_loop();
 
-				// Stop the robot
-				current_state.speedCommand = 0.0;
-
-				printf("== Pausing Movement ==\n");
+				// Constrain speed and direction commands
+				next_state.motors.speed.command = CONSTRAIN(next_state.motors.speed.command , SPEED_MIN, SPEED_MAX);
+				next_state.motors.direction.command = CONSTRAIN(next_state.motors.direction.command, DIR_MIN, DIR_MAX);
 			}
 		}
 
 		break;
 	case RBS_PAUSED:
 		// Stop the robot
-		current_state.speedCommand = 0.0;
+		next_state.motors.speed.target = 0.0;
 
 		// Update the current location
-		update_location(&current_state.position, current_state.sensors.encoders.leftTick, current_state.sensors.encoders.rightTick);
+		next_state.position = update_location(current_state.position, current_state.sensors.encoders.leftTick, current_state.sensors.encoders.rightTick);
 
 		// If Emergency button is released, resume
-		if (PAUSE_BUTTON_PIN.readPin() == true) {
+		if (current_state.buttons.pauseButton == false) {
 
 			// Set robot to paused state;
-			current_state.state = RBS_RUNNING;
+			next_state.state = RBS_RUNNING;
 
 			printf("== Resuming Movement ==\n");
 		}
@@ -308,16 +345,16 @@ void robot_run(union sigval arg) {
 		break;
 	case RBS_FINISHED:
 		// Stop the robot
-		current_state.speedCommand = 0.0;
+		next_state.motors.speed.target = 0.0;
 
-		if (START_BUTTON_PIN.readPin() == false) {
+		if (current_state.buttons.startButton == true) {
 			// Update start delay time to new value
 			start_delay_time = current_time + prgm_vars.startDelayPeriod;
 
 			// Set robot to delay mode
-			current_state.state = RBS_START_DELAY;
-		} else if (PAUSE_BUTTON_PIN.readPin() == false) {
-			current_state.state = RBS_EXIT;
+			next_state.state = RBS_START_DELAY;
+		} else if (current_state.buttons.pauseButton == true) {
+			next_state.state = RBS_EXIT;
 		}
 
 		break;
@@ -325,13 +362,10 @@ void robot_run(union sigval arg) {
 		// Do nothing program exiting
 		break;
 	default:
-		current_state.state = RBS_FINISHED;
+		next_state.state = RBS_FINISHED;
 
 		break;
 	}
-
-	// Update h-bridge output
-	motor_update(current_state.speedCommand, current_state.directionCommand);
 }
 
 // Load a path into the route

@@ -15,7 +15,9 @@
 //
 
 // Update the calculated position with new data
-void update_location(Position *position, long left_encoder_count, long right_encoder_count) {
+Position update_location(const Position current_position, const long left_delta, const long right_delta) {
+	Position new_position;
+
 	float theta_l;
 	float theta_r;
 	float theta_sum;
@@ -24,21 +26,19 @@ void update_location(Position *position, long left_encoder_count, long right_enc
 	float delta_y = 0.0;
 
 	// Left Wheel
-	theta_l = -((float)left_encoder_count * WHEEL_DIM * PI / ENC_COUNT) / WHEEL_BASE;
-//	encoder_left_count = 0;
+	theta_l = -((float)left_delta * WHEEL_DIM * PI / ENC_COUNT) / WHEEL_BASE;
 
-	delta_x += 0.5 * WHEEL_BASE * (sin(position->heading) - sin(position->heading + theta_l));
-	delta_y += 0.5 * WHEEL_BASE * (cos(position->heading + theta_l) - cos(position->heading));
+	delta_x += 0.5 * WHEEL_BASE * (sin(current_position.heading) - sin(current_position.heading + theta_l));
+	delta_y += 0.5 * WHEEL_BASE * (cos(current_position.heading + theta_l) - cos(current_position.heading));
 
 	// Right Wheel
-	theta_r = ((float)right_encoder_count * WHEEL_DIM * PI / ENC_COUNT) / WHEEL_BASE;
-//	encoder_right_count = 0;
+	theta_r = ((float)right_delta * WHEEL_DIM * PI / ENC_COUNT) / WHEEL_BASE;
 
-	delta_x += 0.5 * WHEEL_BASE * (sin(position->heading + theta_r) - sin(position->heading));
-	delta_y += 0.5 * WHEEL_BASE * (cos(position->heading) - cos(position->heading + theta_r));
+	delta_x += 0.5 * WHEEL_BASE * (sin(current_position.heading + theta_r) - sin(current_position.heading));
+	delta_y += 0.5 * WHEEL_BASE * (cos(current_position.heading) - cos(current_position.heading + theta_r));
 
 	// Sum up current theta and delta
-	theta_sum = position->heading + (theta_r + theta_l);
+	theta_sum = current_position.heading + (theta_r + theta_l);
 
 	// Keep theta within +- PI
 	if (theta_sum > PI) {
@@ -49,18 +49,20 @@ void update_location(Position *position, long left_encoder_count, long right_enc
 		theta_sum += 2 * PI;
 	}
 
-	// Update external variables
-	position->location.x += delta_x;
-	position->location.y += delta_y;
-	position->heading = theta_sum;
+	// Update variables
+	new_position.location.x = current_position.location.x + delta_x;
+	new_position.location.y = current_position.location.y + delta_y;
+	new_position.heading = theta_sum;
+
+	return new_position;
 }
 
-void update_speed(float *speed, unsigned long left_period, unsigned long right_period) {
+float update_speed(const unsigned long left_period, const unsigned long right_period) {
 	float rightSpeed;
 	float leftSpeed;
 
 	leftSpeed = (WHEEL_DIM * PI / ENC_COUNT) / (left_period / PERIOD_DIVIDER);
 	rightSpeed = (WHEEL_DIM * PI / ENC_COUNT) / (right_period / PERIOD_DIVIDER);
 
-	*speed = (leftSpeed + rightSpeed) / 2.0;
+	return (leftSpeed + rightSpeed) / 2.0;
 }
